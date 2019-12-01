@@ -73,12 +73,33 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="FillNextPersonForm_button">
-            <property name="toolTip">
-             <string>Pridėkite naują anketą o tada paspauskite kad jį būtų užpildyta su sekančio asmens informacija</string>
-            </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QPushButton" name="FillPersonForm_button">
+              <property name="toolTip">
+               <string>Pridėkite naują anketą o tada paspauskite kad jį būtų užpildyta su sekančio asmens informacija</string>
+              </property>
+              <property name="text">
+               <string>Užpildyti asmens anketą</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="SkipNextPersonForm_button">
+              <property name="toolTip">
+               <string>Pasirinkti sekantį asmenį iš sąrašo</string>
+              </property>
+              <property name="text">
+               <string>Pasirinkti sekantį asmenį</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="A1nextPersonStatus_label">
             <property name="text">
-             <string>Užpildyti sekantčio asmens anketą</string>
+             <string>Nėra pasirinkto žmogaus</string>
             </property>
            </widget>
           </item>
@@ -217,7 +238,6 @@
  <tabstops>
   <tabstop>MainPage_tab</tabstop>
   <tabstop>FillA1MainPage_button</tabstop>
-  <tabstop>FillNextPersonForm_button</tabstop>
   <tabstop>SummaryFileName_line</tabstop>
   <tabstop>SummaryMonth_dropdown</tabstop>
   <tabstop>SummaryCopy_button</tabstop>

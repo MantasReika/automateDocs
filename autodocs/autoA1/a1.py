@@ -3,6 +3,9 @@
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+
 from configparser import RawConfigParser
 from time import sleep
 import csv
@@ -97,8 +100,11 @@ class A1Auto:
     
     def __init__(self):
         configPath = 'config/a1_config.ini'
-        self.currentPersonRowNr = 2
+        self.currentPersonRowNr = 1
         
+        self.isPersonCurrentlySelected = False
+        self.isPersonFoundInDB = False
+
         self.loadConfig(configPath)
         self.loadDataFiles()
         self.loadBrowser()
@@ -184,8 +190,6 @@ class A1Auto:
     def fillA1Form(self):
         self.openSodraForm()
         
-        self.nextPerson()
-
         clickElementByIdJS(self.browser, "currentProfile_requestedForm_A_1")
         enterElementById(self.browser, "currentProfile_employee_surname", self.db_Surname)
         enterElementById(self.browser, "currentProfile_employee_name", self.db_Forename)
@@ -207,10 +211,24 @@ class A1Auto:
 
         radioXpath_shiftChange = "//input[@name='currentProfile.shiftChange' and @value='false']"
         clickElementByXpathJS(self.browser, radioXpath_shiftChange)
+        
+        self.moveToPageTop()
+        
+    def moveToPageTop(self):
+        actions = ActionChains(self.browser)
+        actions.click()
+        actions.send_keys(Keys.HOME)
+        actions.perform()
 
     def nextPerson(self):
         self.currentPersonRowNr += 1
-        person = self.personsToSend[self.currentPersonRowNr]
+        self.isPersonCurrentlySelected = False
+        
+        try:
+            person = self.personsToSend[self.currentPersonRowNr]
+        except IndexError:
+            self.clearPerson()
+            return
 
         self.person_Surname = person[0]
         self.person_Forename = person[1]
@@ -220,12 +238,15 @@ class A1Auto:
         self.person_destinationAddress = person[5]
         self.person_destinationCity = person[6]
         self.person_destinationCountry = person[7]
-
+        
+        self.isPersonCurrentlySelected = True
+        
         logg("", "Searching for person:\nperson_Surname = {}\nperson_Forename = {}\nperson_fromDate = {}\nperson_toDate = {}\nperson_companyName = {}\nperson_destinationAddress = {}\nperson_destinationCity = {}\nperson_destinationCountry = {}\ndocumentNumber = {}".format(self.person_Surname, self.person_Forename, self.person_fromDate, self.person_toDate, self.person_companyName, self.person_destinationAddress, self.person_destinationCity, self.person_destinationCountry, self.documentNumber))
         self.findPersonInDB()
         
     def findPersonInDB(self):
-        foundPersonData = False
+        self.isPersonFoundInDB = False
+
         personDBline = 0
         for db in self.personsDB:    
             personDBline += 1
@@ -243,14 +264,16 @@ class A1Auto:
                 self.db_Country = "Lietuva"
                 self.db_Profesion = db[7]
                 logg("","In DB:\ndb_Surname = {}\ndb_Forename = {}\ndb_BirthDate = {}\ndb_Citizienship = {}\ndb_PersonCode = {}\ndb_InsuranceNumber = {}\ndb_Address = {}\ndb_Country = {}\ndb_Profesion = {}".format(self.db_Surname, self.db_Forename, self.db_BirthDate, self.db_Citizienship, self.db_PersonCode, self.db_InsuranceNumber, self.db_Address, self.db_Country, self.db_Profesion))
-                foundPersonData = True
+                self.isPersonFoundInDB = True
                 break
         
-        #Ask for user confirmation to continue
         logg("DB searched lines: ", personDBline)
         logg("", "")
     
-    def clearPerson():
+    def clearPerson(self):
+        self.isPersonCurrentlySelected = False
+        self.isPersonFoundInDB = False
+        
         self.person_Surname = ""
         self.person_Forename = ""
         self.person_fromDate = ""
@@ -270,7 +293,8 @@ class A1Auto:
         self.db_Country = ""
         self.db_Profesion = ""
 
-        
+    def isPersonAvailable(self):
+        return (self.isPersonCurrentlySelected and self.isPersonFoundInDB)
     
 """
 def mainA1():

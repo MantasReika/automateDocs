@@ -20,7 +20,8 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
         
     def enableA1Forms(self, mode):
         self.FillA1MainPage_button.setEnabled(mode)
-        self.FillNextPersonForm_button.setEnabled(mode)
+        self.FillPersonForm_button.setEnabled(mode)
+        self.SkipNextPersonForm_button.setEnabled(mode)
         self.initA1MainPage_button.setEnabled(not mode)
 
     def enableSummaryForms(self, mode):
@@ -31,10 +32,30 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
 
     def initA1(self):
         self.A1 = A1Auto()
-        self.FillA1MainPage_button.released.connect(self.A1.fillA1Page)
-        self.FillNextPersonForm_button.released.connect(self.A1.fillA1Form)
-        self.enableA1Forms(True)
 
+        self.FillA1MainPage_button.released.connect(self.A1.fillA1Page)
+        self.FillPersonForm_button.released.connect(self.fillNextA1Form)
+        self.SkipNextPersonForm_button.released.connect(self.findNextPerson)
+        self.enableA1Forms(True)
+    
+    def fillNextA1Form(self):        
+        if self.A1.isPersonAvailable():
+            self.A1.fillA1Form()
+        
+    def findNextPerson(self):
+        self.A1.nextPerson()
+        if not self.A1.isPersonCurrentlySelected:
+            self.A1nextPersonStatus_label.setText("Nėra sekančio asmens")
+            print("Nėra sekančio asmens")
+            return
+        elif not self.A1.isPersonFoundInDB:
+            self.A1nextPersonStatus_label.setText("'{} {}' nerastas duombazėje".format(self.A1.person_Surname, self.A1.person_Forename))
+            print("'{} {}' nerastas duombazėje".format(self.A1.person_Surname, self.A1.person_Forename))
+            return
+            
+        self.A1nextPersonStatus_label.setText("Dabar pasirinktas asmuo: '{} {}'".format(self.A1.person_Surname, self.A1.person_Forename))
+        QtWidgets.qApp.processEvents()
+    
     def initSummary(self):
         self.SummaryCopy_button.released.connect(self.copySummary)
         self.enableSummaryForms(True)
