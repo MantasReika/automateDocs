@@ -24,7 +24,7 @@
     <item>
      <widget class="QTabWidget" name="MainPage_tab">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_a1">
        <attribute name="title">
@@ -37,6 +37,13 @@
            <widget class="QPushButton" name="initA1MainPage_button">
             <property name="text">
              <string>Pradėti</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="ReloadConfig_button">
+            <property name="text">
+             <string>Perkrauti nustatymus</string>
             </property>
            </widget>
           </item>
@@ -75,7 +82,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QPushButton" name="FillPersonForm_button">
+             <widget class="QPushButton" name="FillPerson_button">
               <property name="toolTip">
                <string>Pridėkite naują anketą o tada paspauskite kad jį būtų užpildyta su sekančio asmens informacija</string>
               </property>
@@ -85,12 +92,19 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="SkipNextPersonForm_button">
+             <widget class="QPushButton" name="NextPerson_button">
               <property name="toolTip">
                <string>Pasirinkti sekantį asmenį iš sąrašo</string>
               </property>
               <property name="text">
                <string>Pasirinkti sekantį asmenį</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="PreviousPerson_button">
+              <property name="text">
+               <string>Pasirinkti praeitą asmenį</string>
               </property>
              </widget>
             </item>
@@ -219,6 +233,139 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="generate_secondments">
+       <attribute name="title">
+        <string>Įsakymų generavimas</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QPushButton" name="initSecondmentGenerateMainPage_button">
+            <property name="text">
+             <string>Pradėti</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="SecondmentSummaryFileName_line">
+            <property name="text">
+             <string notr="true">Naujausia-kom.-suvestinė-2019m.xlsx</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="SecondmentSummaryMonth_dropdown">
+            <property name="maxVisibleItems">
+             <number>12</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>Sausis</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Vasaris</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Kovas</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Balandis</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Gegužė</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Birželis</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Liepa</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Rugpjūtis</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Rugsėjis</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Spalis</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Lapkritis</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Gruodis</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="secondmentDocFormationDate_label">
+            <property name="text">
+             <string>Įsakymų sukurimo data (yyyy.MM.mm):</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateEdit" name="SecondmentDocFormationDate_DateEdit">
+            <property name="dateTime">
+             <datetime>
+              <hour>0</hour>
+              <minute>0</minute>
+              <second>0</second>
+              <year>2020</year>
+              <month>1</month>
+              <day>1</day>
+             </datetime>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="SecondmentGenerate_button">
+            <property name="text">
+             <string>Generuoti įsakymų dokumentus</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -236,7 +383,6 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <tabstops>
-  <tabstop>MainPage_tab</tabstop>
   <tabstop>FillA1MainPage_button</tabstop>
   <tabstop>SummaryFileName_line</tabstop>
   <tabstop>SummaryMonth_dropdown</tabstop>

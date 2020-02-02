@@ -4,6 +4,7 @@ import sys
 
 from autoA1.a1 import A1Auto
 from autoSummary.Summary import Summary as SummaryAuto
+from autoSecondment.SecondmentGenerator import SecondmentGenerator
 
 class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
     
@@ -13,32 +14,51 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
         
         self.enableA1Forms(False)
         self.enableSummaryForms(False)
+        self.enableSecondmentForms(False)
         
         self.initA1MainPage_button.released.connect(self.initA1)
         
         self.initSummaryMainPage_button.released.connect(self.initSummary)
         
+        self.initSecondmentGenerateMainPage_button.released.connect(self.initSecondment)
+        
     def enableA1Forms(self, mode):
-        self.FillA1MainPage_button.setEnabled(mode)
-        self.FillPersonForm_button.setEnabled(mode)
-        self.SkipNextPersonForm_button.setEnabled(mode)
         self.initA1MainPage_button.setEnabled(not mode)
+        self.FillA1MainPage_button.setEnabled(mode)
+        self.FillPerson_button.setEnabled(mode)
+        self.NextPerson_button.setEnabled(mode)
+        self.ReloadConfig_button.setEnabled(mode)
+        self.PreviousPerson_button.setEnabled(mode)
 
     def enableSummaryForms(self, mode):
+        self.initSummaryMainPage_button.setEnabled(not mode)
         self.SummaryFileName_line.setEnabled(mode)
         self.SummaryMonth_dropdown.setEnabled(mode)
         self.SummaryCopy_button.setEnabled(mode)
-        self.initSummaryMainPage_button.setEnabled(not mode)
 
+    def enableSecondmentForms(self, mode):
+        self.initSecondmentGenerateMainPage_button.setEnabled(not mode)
+        self.SecondmentSummaryFileName_line.setEnabled(mode)
+        self.SecondmentSummaryMonth_dropdown.setEnabled(mode)
+        self.SecondmentDocFormationDate_DateEdit.setEnabled(mode)
+        self.SecondmentGenerate_button.setEnabled(mode)
+    
     def initA1(self):
         self.A1 = A1Auto()
-
+        
         self.FillA1MainPage_button.released.connect(self.A1.fillA1Page)
-        self.FillPersonForm_button.released.connect(self.fillNextA1Form)
-        self.SkipNextPersonForm_button.released.connect(self.findNextPerson)
+        self.FillPerson_button.released.connect(self.fillNextA1Form)
+        self.NextPerson_button.released.connect(self.findNextPerson)
+        self.PreviousPerson_button.released.connect(self.findPreviousPerson)
+        self.ReloadConfig_button.released.connect(self.reloadConfig)
         self.enableA1Forms(True)
+
+    def reloadConfig(self):
+        self.A1.loadConfig(self.A1.configPath)
+        self.A1.loadDataFiles()
+        popupInfo = PopupInfo("Success", "Reloaded configuration from: {}".format(self.A1.configPath))
     
-    def fillNextA1Form(self):        
+    def fillNextA1Form(self):
         if self.A1.isPersonAvailable():
             self.A1.fillA1Form()
         
@@ -46,22 +66,31 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
         self.A1.nextPerson()
         if not self.A1.isPersonCurrentlySelected:
             self.A1nextPersonStatus_label.setText("Nėra sekančio asmens")
-            print("Nėra sekančio asmens")
             return
         elif not self.A1.isPersonFoundInDB:
             self.A1nextPersonStatus_label.setText("'{} {}' nerastas duombazėje".format(self.A1.person_Surname, self.A1.person_Forename))
-            print("'{} {}' nerastas duombazėje".format(self.A1.person_Surname, self.A1.person_Forename))
             return
             
         self.A1nextPersonStatus_label.setText("Dabar pasirinktas asmuo: '{} {}'".format(self.A1.person_Surname, self.A1.person_Forename))
         QtWidgets.qApp.processEvents()
     
+    def findPreviousPerson(self):
+        self.A1.previousPerson()
+        if not self.A1.isPersonCurrentlySelected:
+            self.A1nextPersonStatus_label.setText("Nėra praeito asmens")
+            return
+        elif not self.A1.isPersonFoundInDB:
+            self.A1nextPersonStatus_label.setText("'{} {}' nerastas duombazėje".format(self.A1.person_Surname, self.A1.person_Forename))
+            return
+            
+        self.A1nextPersonStatus_label.setText("Dabar pasirinktas asmuo: '{} {}'".format(self.A1.person_Surname, self.A1.person_Forename))
+        QtWidgets.qApp.processEvents()
+                
     def initSummary(self):
-        self.SummaryCopy_button.released.connect(self.copySummary)
+        self.SummaryCopy_button.released.connect(self.runSummary)
         self.enableSummaryForms(True)
 
-
-    def copySummary(self):
+    def runSummary(self):
         fileName = self.SummaryFileName_line.text()
         currentMonth = int(self.SummaryMonth_dropdown.currentIndex()) + 1
         
@@ -73,6 +102,22 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
             popupInfo = PopupInfo("Success", "New file generated:\n{}".format(summ.newFileName))
         except FileNotFoundError:
             popupError = PopupError("File not found", fileName)
+
+    def initSecondment(self):
+        self.SecondmentGenerate_button.released.connect(self.runSecondments)
+        self.enableSecondmentForms(True)
+        
+    def runSecondments(self):
+        fileName = self.SecondmentSummaryFileName_line.text()
+        currentMonth = int(self.SecondmentSummaryMonth_dropdown.currentIndex()) + 1
+        docFormationDate = self.SecondmentDocFormationDate_DateEdit.text()
+        print("fileName={}, currentMonth={}, docFormationDate={}".format(fileName, currentMonth, docFormationDate))
+        sec = SecondmentGenerator()
+        sec.openSummaryFile(fileName, currentMonth)
+        sec.setSummaryRelativeCollumn(currentMonth)
+        sec.readAllRows()
+        sec.generateSecondments()
+
 
 class PopupError():
     def __init__(self, errorName, errorMessage):

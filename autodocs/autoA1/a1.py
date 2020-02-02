@@ -14,7 +14,8 @@ import re
 
 
 def logg(a, b):
-    print("{} {}".format(a, b))
+    #print("{} {}".format(a, b))
+    pass
 
 def selectDropdownById(browser, elemId, val):
     browser.execute_script("$('#{}').val('{}').trigger('chosen:updated')".format(elemId, val))
@@ -99,13 +100,13 @@ def selectPeople():
 class A1Auto:
     
     def __init__(self):
-        configPath = 'config/a1_config.ini'
-        self.currentPersonRowNr = 1
+        self.configPath = 'config/a1_config.ini'
+        self.currentPersonRowNr = -1
         
         self.isPersonCurrentlySelected = False
         self.isPersonFoundInDB = False
 
-        self.loadConfig(configPath)
+        self.loadConfig(self.configPath)
         self.loadDataFiles()
         self.loadBrowser()
         self.openSodraMain()
@@ -131,7 +132,7 @@ class A1Auto:
 
     def loadDataFiles(self):
         f = open(self.personsDBfile, "r", encoding="UTF-8")
-        personsperson_csv = csv.reader(f, delimiter=";")
+        person_csv = csv.reader(f, delimiter=";")
 
         f2 = open(self.personsToSendFile, "r", encoding="UTF-8")
         personsToSend_csv = csv.reader(f2, delimiter=";")
@@ -139,13 +140,13 @@ class A1Auto:
         self.personsDB = []
         self.personsToSend = []
         
-        for row in personsperson_csv:
+        for row in person_csv:
             self.personsDB.append(row)
 
         for row in personsToSend_csv:
             self.personsToSend.append(row)
         #        print("{}".format(row[0:10]))
-    
+        
     def loadBrowser(self):
 
         if getattr(sys, 'frozen', False): 
@@ -221,9 +222,45 @@ class A1Auto:
         actions.perform()
 
     def nextPerson(self):
-        self.currentPersonRowNr += 1
         self.isPersonCurrentlySelected = False
+        personCount = len(self.personsToSend)
         
+        # if last person, then set currentPersonRowNr to first person
+        if self.currentPersonRowNr == personCount - 1:
+            self.currentPersonRowNr = 0
+        else:
+            self.currentPersonRowNr += 1
+               
+        try:
+            person = self.personsToSend[self.currentPersonRowNr]
+        except IndexError:
+            self.clearPerson()
+            return
+
+        self.person_Surname = person[0]
+        self.person_Forename = person[1]
+        self.person_fromDate = person[2]
+        self.person_toDate = person[3]
+        self.person_companyName = person[4]
+        self.person_destinationAddress = person[5]
+        self.person_destinationCity = person[6]
+        self.person_destinationCountry = person[7]
+        
+        self.isPersonCurrentlySelected = True
+        
+        logg("", "Searching for person:\nperson_Surname = {}\nperson_Forename = {}\nperson_fromDate = {}\nperson_toDate = {}\nperson_companyName = {}\nperson_destinationAddress = {}\nperson_destinationCity = {}\nperson_destinationCountry = {}\ndocumentNumber = {}".format(self.person_Surname, self.person_Forename, self.person_fromDate, self.person_toDate, self.person_companyName, self.person_destinationAddress, self.person_destinationCity, self.person_destinationCountry, self.documentNumber))
+        self.findPersonInDB()
+
+    def previousPerson(self):
+        self.isPersonCurrentlySelected = False
+        personCount = len(self.personsToSend)
+        
+        # if first person (in negative array direction) then set currentPersonRowNr to last person
+        if abs(self.currentPersonRowNr) == personCount:
+            self.currentPersonRowNr = -1
+        else:
+            self.currentPersonRowNr -= 1
+            
         try:
             person = self.personsToSend[self.currentPersonRowNr]
         except IndexError:
