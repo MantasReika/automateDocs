@@ -28,7 +28,7 @@ class SummaryReader:
     def __init__(self):
         
         self.startingRow = 6
-        self.lastRow = 1850 + 1
+        self.lastRow = 5000
         
         self.currentRowId = 0
         self.personFirstRowId = 0

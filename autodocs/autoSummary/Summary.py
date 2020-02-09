@@ -1,7 +1,9 @@
 # ~*~ coding: utf-8 ~*~
 
+import logging
 from openpyxl import load_workbook  # Workbook
 import datetime
+import os
 
 class Summary:
     wb = ""
@@ -18,8 +20,12 @@ class Summary:
         self.currentRowId = 0
         self.personFirstRowId = 0
         self.relativeCol = 11 + ((currentMonth - 1 ) * 7)
+
+        self.fileName = fileName.split(".xlsx")[0]
+        if not os.path.isfile(self.fileName + ".xlsx"):
+            raise FileNotFoundError("summary file='{}' does not exist at path='{}'".format(self.fileName + ".xlsx", os.getcwd()))
       
-        self.wb = load_workbook(self.fileName)
+        self.wb = load_workbook(self.fileName + ".xlsx")
         self.ws = self.wb.active
 
     def isValidStructuredDocument(self):

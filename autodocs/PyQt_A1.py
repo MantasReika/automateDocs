@@ -108,6 +108,10 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
             popupInfo = PopupInfo("Success", "New file generated:\n{}".format(summ.newFileName))
         except FileNotFoundError:
             popupError = PopupError("File not found", fileName)
+            self.logEvent("File '{}' not found".format(fileName))
+        except Exception as e:
+            logging.error("Failed to copy summary file='{}', currentMonth='{}'; error: {}".format(fileName, currentMonth, e))
+            self.logEvent("Failed to copy summary file='{}', currentMonth='{}'".format(file, currentMonth))
 
     def initSecondment(self):
         self.SecondmentGenerate_button.released.connect(self.runSecondments)
