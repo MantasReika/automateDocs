@@ -1,3 +1,4 @@
+import logging
 import os
 import docx
 import json
@@ -153,18 +154,19 @@ def createSecondmentDocument (record, doc, paragraphIdx, runIdx, c, goodRecord):
     else:
         docDir = c.FAILED_DOCUMENTS_DIR
     
-    #doc = Document(c.TEMPLATE_NAME)
     s = SecondmentData(record)
     s.setConstants(c.GALININKO_LINKSNIAI, c.MONTHS, c.GA1, c.GA2, c.PROFESIJA, c.DIENPINIGIAI, c.KEYS)
 
-#try:
     for key in c.KEYS:
-        placeHolderRun = doc.paragraphs[paragraphIdx[key]].runs[runIdx[key]].text
-        # print("key={}, s.translateKeyToValue(key)={}".format(key, s.translateKeyToValue(key)))
-        doc.paragraphs[paragraphIdx[key]].runs[runIdx[key]].text = placeHolderRun.replace(key, s.translateKeyToValue(key))
-#except Exception as e:
-#    print('Something unrecognised for: %s\nError message: %s\n' % (record[2], repr(e)))
-#    return
+        try:
+            placeHolderRun = doc.paragraphs[paragraphIdx[key]].runs[runIdx[key]].text
+            doc.paragraphs[paragraphIdx[key]].runs[runIdx[key]].text = placeHolderRun.replace(key, s.translateKeyToValue(key))
+        except KeyError as e:
+            logging.warning("Person: {}; Cannot replace value: '{}'; Error message: {}".format(record[2], key, repr(e)))    
+        except Exception as e:
+            logging.error("Person: {}; Unable to create secondment; Error message: {}".format((record[2], repr(e))))
+            return
+
     currentDir = os.getcwd()
     
     if currentDir[-len(s.getCountry()):] != s.getCountry().upper():       
@@ -188,25 +190,25 @@ def createSecondmentDocument (record, doc, paragraphIdx, runIdx, c, goodRecord):
                 doc.save(s.getPersonName().split(' ')[0] + " " + s.getGa() + " " + "%s" % fileNr + '.docx')
 
 def loadJsonData():
-    with open('autoSecondment/generatorUtils/GALININKO_LINKSNIAI.json', 'r', encoding='utf8') as fp:
+    with open('autoSecondment/generatorUtils/json/GALININKO_LINKSNIAI.json', 'r', encoding='utf8') as fp:
         GALININKO_LINKSNIAI = json.load(fp)
         
-    with open('autoSecondment/generatorUtils/MONTHS.json', 'r', encoding='utf8') as fp:
+    with open('autoSecondment/generatorUtils/json/MONTHS.json', 'r', encoding='utf8') as fp:
         MONTHS = json.load(fp)
 
-    with open('autoSecondment/generatorUtils/GA1.json', 'r', encoding='utf8') as fp:
+    with open('autoSecondment/generatorUtils/json/GA1.json', 'r', encoding='utf8') as fp:
         GA1 = json.load(fp)
 
-    with open('autoSecondment/generatorUtils/GA2.json', 'r', encoding='utf8') as fp:
+    with open('autoSecondment/generatorUtils/json/GA2.json', 'r', encoding='utf8') as fp:
         GA2 = json.load(fp)
 
-    with open('autoSecondment/generatorUtils/PROFESIJA.json', 'r', encoding='utf8') as fp:
+    with open('autoSecondment/generatorUtils/json/PROFESIJA.json', 'r', encoding='utf8') as fp:
         PROFESIJA = json.load(fp)
 
-    with open('autoSecondment/generatorUtils/DIENPINIGIAI.json', 'r', encoding='utf8') as fp:
+    with open('autoSecondment/generatorUtils/json/DIENPINIGIAI.json', 'r', encoding='utf8') as fp:
         DIENPINIGIAI = json.load(fp)
         
-    with open('autoSecondment/generatorUtils/DocumentPlaceHolders.json', 'r', encoding='utf8') as fp:
+    with open('autoSecondment/generatorUtils/json/DocumentPlaceHolders.json', 'r', encoding='utf8') as fp:
         KEYS = json.load(fp)
 
     return GALININKO_LINKSNIAI, MONTHS, GA1, GA2, PROFESIJA, DIENPINIGIAI, KEYS

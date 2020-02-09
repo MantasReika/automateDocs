@@ -1,10 +1,14 @@
-from PyQt5 import QtWidgets
-from autoUI import MainView as MainViewUI
+import logging
 import sys
 
+from PyQt5 import QtWidgets
+from autoUI import MainView as MainViewUI
+
+import Logger
 from autoA1.a1 import A1Auto
 from autoSummary.Summary import Summary as SummaryAuto
 from autoSecondment.SecondmentGenerator import SecondmentGenerator
+from autoSecondment.generatorUtils.SummaryReader import SummaryReader
 
 class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
     
@@ -22,6 +26,9 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
         
         self.initSecondmentGenerateMainPage_button.released.connect(self.initSecondment)
         
+    def logEvent(self, message):
+        self.EventLog_listWidget.addItem(QtWidgets.QListWidgetItem(message))
+
     def enableA1Forms(self, mode):
         self.initA1MainPage_button.setEnabled(not mode)
         self.FillA1MainPage_button.setEnabled(mode)
@@ -40,7 +47,6 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
         self.initSecondmentGenerateMainPage_button.setEnabled(not mode)
         self.SecondmentSummaryFileName_line.setEnabled(mode)
         self.SecondmentSummaryMonth_dropdown.setEnabled(mode)
-        self.SecondmentDocFormationDate_DateEdit.setEnabled(mode)
         self.SecondmentGenerate_button.setEnabled(mode)
     
     def initA1(self):
@@ -108,15 +114,27 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
         self.enableSecondmentForms(True)
         
     def runSecondments(self):
+        self.EventLog_listWidget.clear()
         fileName = self.SecondmentSummaryFileName_line.text()
         currentMonth = int(self.SecondmentSummaryMonth_dropdown.currentIndex()) + 1
-        docFormationDate = self.SecondmentDocFormationDate_DateEdit.text()
-        print("fileName={}, currentMonth={}, docFormationDate={}".format(fileName, currentMonth, docFormationDate))
+        logging.info("Secondment parameters: secondmentfileName={}, currentMonth={}".format(fileName, currentMonth))
+        
+        try:
+            summaryReader = SummaryReader()
+            summaryReader.openSummaryFile(fileName, currentMonth)
+            summaryReader.setSummaryRelativeCollumn(currentMonth)
+            summaryReader.readInPersonRecords()
+        except FileNotFoundError as e:
+            popupError = PopupError("File not found", fileName)
+            self.logEvent("File not found")
+            return
+
         sec = SecondmentGenerator()
-        sec.openSummaryFile(fileName, currentMonth)
-        sec.setSummaryRelativeCollumn(currentMonth)
-        sec.readAllRows()
+        sec.setPersonRecords(summaryReader.getPersonRecords())
         sec.generateSecondments()
+        Logger.formLogHtml()
+        for err in Logger.getLogEntries("WARNING,ERROR"):
+            self.logEvent(err)
 
 
 class PopupError():
@@ -143,6 +161,7 @@ class PopupInfo():
 
 
 def main():
+    Logger.startLogger()
     app = QtWidgets.QApplication(sys.argv)
     application = ApplicationWindow()
     application.show()

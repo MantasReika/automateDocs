@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
-    <height>238</height>
+    <width>705</width>
+    <height>362</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,8 +23,20 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QTabWidget" name="MainPage_tab">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="sizeIncrement">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_a1">
        <attribute name="title">
@@ -97,14 +109,14 @@
                <string>Pasirinkti sekantį asmenį iš sąrašo</string>
               </property>
               <property name="text">
-               <string>Pasirinkti sekantį asmenį</string>
+               <string>Sekantis asmuo</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="PreviousPerson_button">
               <property name="text">
-               <string>Pasirinkti praeitą asmenį</string>
+               <string>Praeitas asmuo</string>
               </property>
              </widget>
             </item>
@@ -335,27 +347,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="secondmentDocFormationDate_label">
-            <property name="text">
-             <string>Įsakymų sukurimo data (yyyy.MM.mm):</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QDateEdit" name="SecondmentDocFormationDate_DateEdit">
-            <property name="dateTime">
-             <datetime>
-              <hour>0</hour>
-              <minute>0</minute>
-              <second>0</second>
-              <year>2020</year>
-              <month>1</month>
-              <day>1</day>
-             </datetime>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="SecondmentGenerate_button">
             <property name="text">
              <string>Generuoti įsakymų dokumentus</string>
@@ -368,6 +359,23 @@
       </widget>
      </widget>
     </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Įvykiai:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListWidget" name="EventLog_listWidget"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_5"/>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -375,7 +383,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>420</width>
+     <width>705</width>
      <height>18</height>
     </rect>
    </property>
