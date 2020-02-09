@@ -50,6 +50,8 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
         self.SecondmentGenerate_button.setEnabled(mode)
     
     def initA1(self):
+        self.EventLog_listWidget.clear()
+
         self.A1 = A1Auto()
         
         self.FillA1MainPage_button.released.connect(self.A1.fillA1Page)
@@ -82,6 +84,7 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
     
     def findPreviousPerson(self):
         self.A1.previousPerson()
+
         if not self.A1.isPersonCurrentlySelected:
             self.A1nextPersonStatus_label.setText("Nėra praeito asmens")
             return
@@ -97,6 +100,8 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
         self.enableSummaryForms(True)
 
     def runSummary(self):
+        self.EventLog_listWidget.clear()
+
         fileName = self.SummaryFileName_line.text()
         currentMonth = int(self.SummaryMonth_dropdown.currentIndex()) + 1
         
@@ -105,6 +110,9 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
             summ.isValidStructuredDocument()
             summ.processRows()
             summ.saveFile()
+            
+            logging.info("Success, new file generated:{}".format(summ.newFileName))
+            self.logEvent("Success, new file generated:{}".format(summ.newFileName))
             popupInfo = PopupInfo("Success", "New file generated:\n{}".format(summ.newFileName))
         except FileNotFoundError:
             popupError = PopupError("File not found", fileName)
@@ -133,12 +141,21 @@ class ApplicationWindow(QtWidgets.QMainWindow, MainViewUI.Ui_MainWindow):
             self.logEvent("File not found")
             return
 
-        sec = SecondmentGenerator()
-        sec.setPersonRecords(summaryReader.getPersonRecords())
-        sec.generateSecondments()
-        Logger.formLogHtml()
-        for err in Logger.getLogEntries("WARNING,ERROR"):
-            self.logEvent(err)
+        try:
+            sec = SecondmentGenerator()
+            sec.setPersonRecords(summaryReader.getPersonRecords())
+            sec.generateSecondments()
+
+            logging.info("Success, secondments generated from file:{}".format(fileName))
+            self.logEvent("Success, secondments generated from file:{}".format(fileName))
+            popupInfo = PopupInfo("Success", "Secondments generated from file:{}".format(fileName))
+
+            Logger.formLogHtml()
+            for err in Logger.getLogEntries("WARNING,ERROR"):
+                self.logEvent(err)
+        except Exception as e:
+            logging.error("Failed generate secondments from file='{}', currentMonth='{}'; error: {}".format(fileName, currentMonth, e))
+            self.logEvent("Failed generate secondments from file='{}', currentMonth='{}'".format(file, currentMonth))
 
 
 class PopupError():
