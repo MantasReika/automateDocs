@@ -5,7 +5,7 @@ def startLogger(logFileName="app.log"):
     logging.getLogger().setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s|%(levelname)s|%(message)s', datefmt='%d/%m/%Y %H:%M:%S')
 
-    fh = logging.FileHandler(logFileName, mode='w')
+    fh = logging.FileHandler(logFileName, mode='w', encoding='utf-8')
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
 
@@ -29,11 +29,11 @@ def formLogHtml(logFileName="app.log"):
     <table style='width:100%'>
 """
 
-    os.chdir("C:/Users/s3223b/Work Folders/Documents/PythonWorkspace/AutomateDocs/AutomateDocs/autodocs")
-    with open('SecondmentLog.html', 'w+') as htmlFile:
+    os.chdir("../..")
+    with open('SecondmentLog.html', 'w+', encoding='utf-8') as htmlFile:
         htmlFile.write(htmlHeader)
         htmlFile.write("<tr class='header'><th>Level</th><th>Message</th><th>Error</th></tr>")
-        with open(logFileName, 'r') as logFile:
+        with open(logFileName, 'r', encoding='utf-8') as logFile:
             for logEntry in logFile:
                 try:
                     logLevel = logEntry.split('|')[1]
@@ -51,7 +51,7 @@ def formLogHtml(logFileName="app.log"):
 
 def getLogEntries(errorLevels, logFileName="app.log"):
     entries = []
-    with open(logFileName, 'r') as logFile:
+    with open(logFileName, 'r', encoding='utf-8') as logFile:
         for logEntry in logFile:
             logLevel = logEntry.split('|')[1]
             if logLevel in errorLevels.split(','):
