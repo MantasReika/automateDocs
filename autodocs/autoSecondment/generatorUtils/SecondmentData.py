@@ -100,7 +100,7 @@ class SecondmentData:
     def geCountry3(self):
         return self.getCountry()[:-1] + 'oje'
     def getProfesion(self):
-        return self.PROFESIJA[self.record[4].strip()]
+        return self.PROFESIJA[self.record[4].strip().lower()]
     def getAllowence1(self):
         val = self.getDienpinigiai(self.DIENPINIGIAI, self.getCountry(), "min")
         if val == False:

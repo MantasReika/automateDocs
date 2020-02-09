@@ -220,13 +220,13 @@ def mapCodeToCountry(key):
     'BELG': 'Belgija',
     'VOKE': 'Vokietija',
     'OLAND': 'Olandija',
-    'Šveicarija': 'Šveicarija',
-    'Latvija': 'Latvija',
-    'Lenkija': 'Lenkija',
-    'Estija': 'Estija',
-    'Danija': 'Danija',
-    'Slovakija': 'Slovakija',
-    'Suomija': 'Suomija'
+    'ŠVEIC': 'Šveicarija',
+    'LAT': 'Latvija',
+    'LENK': 'Lenkija',
+    'EST': 'Estija',
+    'DAN': 'Danija',
+    'SLOVAK': 'Slovakija',
+    'SUOM': 'Suomija'
 }
 
     try:
